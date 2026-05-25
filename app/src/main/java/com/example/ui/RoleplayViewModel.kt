@@ -49,6 +49,12 @@ class RoleplayViewModel(application: Application) : AndroidViewModel(application
     private val _byokApiKey = MutableStateFlow("")
     val byokApiKey = _byokApiKey.asStateFlow()
 
+    private val _byokOpenAiKey = MutableStateFlow("")
+    val byokOpenAiKey = _byokOpenAiKey.asStateFlow()
+
+    private val _byokOpenAiUrl = MutableStateFlow("")
+    val byokOpenAiUrl = _byokOpenAiUrl.asStateFlow()
+
     private val _themeSelection = MutableStateFlow("Frosted Glass")
     val themeSelection = _themeSelection.asStateFlow()
 
@@ -63,6 +69,8 @@ class RoleplayViewModel(application: Application) : AndroidViewModel(application
         // Load initial settings
         viewModelScope.launch {
             _byokApiKey.value = repository.getSettingValue("byok_gemini_key", "")
+            _byokOpenAiKey.value = repository.getSettingValue("byok_openai_key", "")
+            _byokOpenAiUrl.value = repository.getSettingValue("byok_openai_url", "")
             _primaryModel.value = repository.getSettingValue("primary_model_override", "gemini-3.5-flash")
             _themeSelection.value = repository.getSettingValue("active_theme", "Frosted Glass")
 
@@ -286,6 +294,20 @@ class RoleplayViewModel(application: Application) : AndroidViewModel(application
         _byokApiKey.value = key
         viewModelScope.launch {
             repository.saveSetting("byok_gemini_key", key)
+        }
+    }
+
+    fun updateByokOpenAiKey(key: String) {
+        _byokOpenAiKey.value = key
+        viewModelScope.launch {
+            repository.saveSetting("byok_openai_key", key)
+        }
+    }
+
+    fun updateByokOpenAiUrl(url: String) {
+        _byokOpenAiUrl.value = url
+        viewModelScope.launch {
+            repository.saveSetting("byok_openai_url", url)
         }
     }
 

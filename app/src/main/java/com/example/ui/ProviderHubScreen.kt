@@ -33,17 +33,29 @@ fun ProviderHubScreen(viewModel: RoleplayViewModel) {
 
     val primaryModelSelected by viewModel.primaryModel.collectAsState()
     val userKeySaved by viewModel.byokApiKey.collectAsState()
+    val userOpenAiKeySaved by viewModel.byokOpenAiKey.collectAsState()
+    val userOpenAiUrlSaved by viewModel.byokOpenAiUrl.collectAsState()
 
     var inputKey by remember { mutableStateOf(userKeySaved) }
-    var selectedModel by remember { mutableStateOf(primaryModelSelected) }
+    var inputOpenAiKey by remember { mutableStateOf(userOpenAiKeySaved) }
+    var inputOpenAiUrl by remember { mutableStateOf(userOpenAiUrlSaved) }
+    var typedModel by remember { mutableStateOf(primaryModelSelected) }
     var budgetCapText by remember { mutableStateOf("5.00") }
 
     LaunchedEffect(userKeySaved) {
         inputKey = userKeySaved
     }
 
+    LaunchedEffect(userOpenAiKeySaved) {
+        inputOpenAiKey = userOpenAiKeySaved
+    }
+
+    LaunchedEffect(userOpenAiUrlSaved) {
+        inputOpenAiUrl = userOpenAiUrlSaved
+    }
+
     LaunchedEffect(primaryModelSelected) {
-        selectedModel = primaryModelSelected
+        typedModel = primaryModelSelected
     }
 
     val isGlass = themeName == "Frosted Glass"
@@ -124,10 +136,10 @@ fun ProviderHubScreen(viewModel: RoleplayViewModel) {
                         )
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // Key Input
+                        // Gemini Key Input
                         Text("Custom Gemini API Key Override", color = theme.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                         Text(
-                            "Leave empty to use built-in AI Studio API key.",
+                            "Used for core Gemini model routing if specified.",
                             color = theme.textSecondary,
                             fontSize = 11.sp,
                             modifier = Modifier.padding(bottom = 6.dp)
@@ -141,7 +153,7 @@ fun ProviderHubScreen(viewModel: RoleplayViewModel) {
                                     Icon(
                                         imageVector = Icons.Default.Check,
                                         contentDescription = "Configured",
-                                        tint = MaterialTheme.colorScheme.primary
+                                        tint = theme.accent
                                     )
                                 }
                             },
@@ -152,38 +164,143 @@ fun ProviderHubScreen(viewModel: RoleplayViewModel) {
                             shape = RoundedCornerShape(10.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = theme.text,
-                                focusedBorderColor = theme.accent
+                                focusedBorderColor = theme.accent,
+                                unfocusedBorderColor = theme.textSecondary.copy(alpha = 0.3f),
+                                unfocusedTextColor = theme.text
                             )
                         )
 
-                        // Model Selector
-                        Text("Active Core LLM Model", color = theme.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        ModelSelectorRow(
-                            label = "Gemini 3.5 Flash (Default & Highly Balanced)",
-                            isSelected = selectedModel == "gemini-3.5-flash",
-                            onClick = { selectedModel = "gemini-3.5-flash" },
-                            themeColors = theme
+                        // OpenAI Key Input
+                        Text("Custom OpenAI API Key Override", color = theme.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            "API key for custom or third-party OpenAI-compatible endpoints.",
+                            color = theme.textSecondary,
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(bottom = 6.dp)
+                        )
+                        OutlinedTextField(
+                            value = inputOpenAiKey,
+                            onValueChange = { inputOpenAiKey = it },
+                            placeholder = { Text("sk-...") },
+                            trailingIcon = {
+                                if (inputOpenAiKey.isNotBlank()) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = "Configured",
+                                        tint = theme.accent
+                                    )
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("openai_key_field")
+                                .padding(bottom = 12.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = theme.text,
+                                focusedBorderColor = theme.accent,
+                                unfocusedBorderColor = theme.textSecondary.copy(alpha = 0.3f),
+                                unfocusedTextColor = theme.text
+                            )
                         )
 
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        ModelSelectorRow(
-                            label = "Gemini 3.1 Pro (Advanced Spatial Reasoning)",
-                            isSelected = selectedModel == "gemini-3.1-pro-preview",
-                            onClick = { selectedModel = "gemini-3.1-pro-preview" },
-                            themeColors = theme
+                        // Custom OpenAI Endpoint Base URL
+                        Text("Custom OpenAI Endpoint URL Base", color = theme.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            "OpenAI-compatible host (e.g. OpenRouter, DeepSeek or Local LLM). Leave empty to use Gemini.",
+                            color = theme.textSecondary,
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(bottom = 6.dp)
+                        )
+                        OutlinedTextField(
+                            value = inputOpenAiUrl,
+                            onValueChange = { inputOpenAiUrl = it },
+                            placeholder = { Text("https://api.openai.com/v1/") },
+                            trailingIcon = {
+                                if (inputOpenAiUrl.isNotBlank()) {
+                                    Icon(
+                                        imageVector = Icons.Default.SettingsEthernet,
+                                        contentDescription = "Custom endpoint active",
+                                        tint = theme.accent
+                                    )
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("openai_url_field")
+                                .padding(bottom = 12.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = theme.text,
+                                focusedBorderColor = theme.accent,
+                                unfocusedBorderColor = theme.textSecondary.copy(alpha = 0.3f),
+                                unfocusedTextColor = theme.text
+                            )
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        // Model Identifier Input override
+                        Text("Active Core LLM Model ID", color = theme.text, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            "Type model identifier directly. E.g. deepseek-chat, gpt-4o, or gemini-3.5-flash",
+                            color = theme.textSecondary,
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(bottom = 6.dp)
+                        )
+                        OutlinedTextField(
+                            value = typedModel,
+                            onValueChange = { typedModel = it },
+                            placeholder = { Text("deepseek-chat") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("model_id_field")
+                                .padding(bottom = 12.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = theme.text,
+                                focusedBorderColor = theme.accent,
+                                unfocusedBorderColor = theme.textSecondary.copy(alpha = 0.3f),
+                                unfocusedTextColor = theme.text
+                            )
+                        )
+
+                        // Model Presets Quick Select row
+                        Text("Quick Model Presets", color = theme.textSecondary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 6.dp))
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
+                        ) {
+                            val presets = listOf("gemini-3.5-flash", "gpt-4o-mini", "deepseek-chat")
+                            presets.forEach { preset ->
+                                val isSelected = typedModel == preset
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(if (isSelected) theme.accent.copy(alpha = 0.2f) else if (isGlass) Color(0x0AFFFFFF) else theme.background)
+                                        .border(
+                                            width = 1.dp,
+                                            color = if (isSelected) theme.accent else theme.textSecondary.copy(alpha = 0.15f),
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                        .clickable { typedModel = preset }
+                                        .padding(vertical = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(preset, color = if (isSelected) theme.accent else theme.text, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        }
 
                         // Save Configuration button
                         Button(
                             onClick = {
                                 viewModel.updateByokKey(inputKey)
-                                viewModel.updatePrimaryModel(selectedModel)
-                                Toast.makeText(context, "Provider configuration synchronized", Toast.LENGTH_SHORT).show()
+                                viewModel.updateByokOpenAiKey(inputOpenAiKey)
+                                viewModel.updateByokOpenAiUrl(inputOpenAiUrl)
+                                viewModel.updatePrimaryModel(typedModel)
+                                Toast.makeText(context, "Provider configurations synchronized", Toast.LENGTH_SHORT).show()
                             },
                             modifier = Modifier
                                 .fillMaxWidth()

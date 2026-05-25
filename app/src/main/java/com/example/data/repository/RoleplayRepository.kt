@@ -157,6 +157,8 @@ class RoleplayRepository(context: Context) {
 
         val customApiKey = getSettingValue("byok_gemini_key").ifBlank { null }
         val modelOverride = getSettingValue("primary_model_override", "gemini-3.5-flash")
+        val customOpenAiKey = getSettingValue("byok_openai_key").ifBlank { null }
+        val customOpenAiUrl = getSettingValue("byok_openai_url").ifBlank { null }
 
         // 1. Lorebook Keeper Triggering
         // Process message text for trigger keywords
@@ -241,7 +243,9 @@ class RoleplayRepository(context: Context) {
             systemInstruction = systemInstruction,
             userApiKey = customApiKey,
             modelOverride = modelOverride,
-            history = historyContents
+            history = historyContents,
+            customOpenAiKey = customOpenAiKey,
+            customOpenAiUrl = customOpenAiUrl
         )
 
         // 7. Save to Database: Swipe or Single Response
@@ -287,6 +291,8 @@ class RoleplayRepository(context: Context) {
     private suspend fun triggerAgents(characterId: Int, sessionId: Int, chatHistory: List<ChatMessage>) {
         val customApiKey = getSettingValue("byok_gemini_key").ifBlank { null }
         val modelOverride = getSettingValue("primary_model_override", "gemini-3.5-flash")
+        val customOpenAiKey = getSettingValue("byok_openai_key").ifBlank { null }
+        val customOpenAiUrl = getSettingValue("byok_openai_url").ifBlank { null }
 
         if (chatHistory.size < 4) return
 
@@ -310,7 +316,9 @@ class RoleplayRepository(context: Context) {
                 systemInstruction = "You are a concise memory curator who extracts plots and facts as summaries.",
                 userApiKey = customApiKey,
                 modelOverride = modelOverride,
-                temperature = 0.5f
+                temperature = 0.5f,
+                customOpenAiKey = customOpenAiKey,
+                customOpenAiUrl = customOpenAiUrl
             )
 
             if (segmentSummary.isNotBlank() && !segmentSummary.contains("Error")) {
@@ -365,7 +373,9 @@ class RoleplayRepository(context: Context) {
                 systemInstruction = "You output state lines in CSV format: Mood | Trust | Goals | Location | Possessions | Injuries | Milestone",
                 userApiKey = customApiKey,
                 modelOverride = modelOverride,
-                temperature = 0.3f
+                temperature = 0.3f,
+                customOpenAiKey = customOpenAiKey,
+                customOpenAiUrl = customOpenAiUrl
             )
 
             if (stateString.isNotBlank() && stateString.contains("|")) {
@@ -403,6 +413,8 @@ class RoleplayRepository(context: Context) {
     suspend fun generateCompleteCharacter(ideaPrompt: String): Character = withContext(Dispatchers.IO) {
         val customApiKey = getSettingValue("byok_gemini_key").ifBlank { null }
         val modelOverride = getSettingValue("primary_model_override", "gemini-3.5-flash")
+        val customOpenAiKey = getSettingValue("byok_openai_key").ifBlank { null }
+        val customOpenAiUrl = getSettingValue("byok_openai_url").ifBlank { null }
 
         val prompt = """
             You are an expert character creator for a SillyTavern-style roleplay app.
@@ -428,7 +440,9 @@ class RoleplayRepository(context: Context) {
             systemInstruction = "You output perfect XML formatted characters.",
             userApiKey = customApiKey,
             modelOverride = modelOverride,
-            temperature = 0.9f
+            temperature = 0.9f,
+            customOpenAiKey = customOpenAiKey,
+            customOpenAiUrl = customOpenAiUrl
         )
 
         fun extractTag(tag: String): String {

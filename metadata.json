@@ -1,0 +1,6 @@
+{
+  "name": "MaiTavern",
+  "description": "Ultimate Mobile-First AI Roleplay Engine with modular agents, memory curation, and lorebooks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -91,7 +91,15 @@ fun MaiTavernApp(viewModel: RoleplayViewModel = viewModel()) {
 
                         NavigationBarItem(
                             selected = currentRoute == "characters",
-                            onClick = { navController.navigate("characters") { popUpTo(0) } },
+                            onClick = {
+                                navController.navigate("characters") {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
                             icon = { Icon(Icons.Default.Person, contentDescription = "Characters") },
                             label = { Text("Characters") },
                             colors = NavigationBarItemDefaults.colors(
@@ -104,7 +112,15 @@ fun MaiTavernApp(viewModel: RoleplayViewModel = viewModel()) {
                         )
                         NavigationBarItem(
                             selected = currentRoute == "chat",
-                            onClick = { navController.navigate("chat") { popUpTo(0) } },
+                            onClick = {
+                                navController.navigate("chat") {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
                             icon = { Icon(Icons.Default.ChatBubble, contentDescription = "Active Chat") },
                             label = { Text("Chat") },
                             colors = NavigationBarItemDefaults.colors(
@@ -117,7 +133,15 @@ fun MaiTavernApp(viewModel: RoleplayViewModel = viewModel()) {
                         )
                         NavigationBarItem(
                             selected = currentRoute == "lorebook",
-                            onClick = { navController.navigate("lorebook") { popUpTo(0) } },
+                            onClick = {
+                                navController.navigate("lorebook") {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
                             icon = { Icon(Icons.Default.MenuBook, contentDescription = "Lorebook") },
                             label = { Text("Lorebook") },
                             colors = NavigationBarItemDefaults.colors(
@@ -130,7 +154,15 @@ fun MaiTavernApp(viewModel: RoleplayViewModel = viewModel()) {
                         )
                         NavigationBarItem(
                             selected = currentRoute == "settings",
-                            onClick = { navController.navigate("settings") { popUpTo(0) } },
+                            onClick = {
+                                navController.navigate("settings") {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
                             icon = { Icon(Icons.Default.Tune, contentDescription = "Settings") },
                             label = { Text("Provider Hub") },
                             colors = NavigationBarItemDefaults.colors(

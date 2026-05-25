@@ -22,13 +22,10 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
-    - name: Restore Certified Clean Gradle Wrapper Jar
-      run: |
-        mkdir -p gradle/wrapper
-        curl -sL -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.10.2/gradle/wrapper/gradle-wrapper.jar
-
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
+      with:
+        validate-wrappers: false
 
     - name: Grant Execute Permission to Gradlew
       run: chmod +x gradlew

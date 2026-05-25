@@ -438,8 +438,12 @@ fun ProviderHubScreen(viewModel: RoleplayViewModel) {
                             Text("Current Daily Accumulation", color = theme.text, fontSize = 12.sp)
                             Text("$0.02 / $${budgetCapText}", color = theme.accent, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                         }
+                        val progressValue = remember(budgetCapText) {
+                            val cap = budgetCapText.toFloatOrNull() ?: 5.0f
+                            if (cap <= 0.001f) 1.0f else (0.02f / cap).coerceIn(0.0f, 1.0f)
+                        }
                         LinearProgressIndicator(
-                            progress = { 0.02f / (budgetCapText.toFloatOrNull() ?: 5.0f) },
+                            progress = { progressValue },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(6.dp)

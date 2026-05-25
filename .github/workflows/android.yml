@@ -21,23 +21,17 @@ jobs:
       with:
         java-version: '21'
         distribution: 'temurin'
+        cache: gradle
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
-      with:
-        gradle-version: '9.3.1'
-
-    - name: Restore Clean Gradle Wrapper Jar
-      run: |
-        mkdir -p gradle/wrapper
-        curl -sL -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v9.3.1/gradle/wrapper/gradle-wrapper.jar
+    - name: Grant Execute Permission to Gradlew
+      run: chmod +x gradlew
 
     - name: Create local.properties with Mock Keys
       run: |
         echo "GEMINI_API_KEY=AIzaSyDummyAPIKeyForCIBuild" > local.properties
 
     - name: Build Debug APK
-      run: gradle assembleDebug --stacktrace
+      run: ./gradlew assembleDebug --stacktrace
 
     - name: Upload Debug APK Artifact
       uses: actions/upload-artifact@v4

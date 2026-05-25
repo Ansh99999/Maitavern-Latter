@@ -22,21 +22,23 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
+    - name: Restore Certified Clean Gradle Wrapper Jar
+      run: |
+        mkdir -p gradle/wrapper
+        curl -sL -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.10.2/gradle/wrapper/gradle-wrapper.jar
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
-      with:
-        gradle-version: '9.3.1'
-        validate-wrappers: false
 
-    - name: Remove corrupt wrapper.jar
-      run: rm -f gradle/wrapper/gradle-wrapper.jar
+    - name: Grant Execute Permission to Gradlew
+      run: chmod +x gradlew
 
     - name: Create local.properties with Mock Keys
       run: |
         echo "GEMINI_API_KEY=AIzaSyDummyAPIKeyForCIBuild" > local.properties
 
     - name: Build Debug APK
-      run: gradle assembleDebug --stacktrace
+      run: ./gradlew assembleDebug --stacktrace
 
     - name: Upload Debug APK Artifact
       uses: actions/upload-artifact@v4
